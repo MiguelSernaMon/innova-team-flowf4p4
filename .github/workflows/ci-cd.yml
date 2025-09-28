@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  statuses: write
+  pull-requests: write
+
 env:
   NODE_VERSION: '22'
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }} 
@@ -127,17 +132,23 @@ jobs:
           
       - name: Create deployment status
         uses: actions/github-script@v7
+        continue-on-error: true
         with:
           script: |
-            github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'success',
-              target_url: '${{ steps.deploy-production.outputs.production-url }}',
-              description: 'Deployed to production',
-              context: 'vercel/production'
-            })
+            try {
+              await github.rest.repos.createCommitStatus({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                sha: context.sha,
+                state: 'success',
+                target_url: '${{ steps.deploy-production.outputs.production-url }}',
+                description: 'Deployed to production',
+                context: 'vercel/production'
+              });
+              console.log('Deployment status created successfully');
+            } catch (error) {
+              console.log('Failed to create deployment status:', error.message);
+            }
 
   # Security Audit
   security-audit:
