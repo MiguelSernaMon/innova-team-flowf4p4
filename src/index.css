@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* InnoSistemas Design System - All colors MUST be HSL */
+@layer base {
+  :root {
+    /* InnoSistemas Brand Colors - Improved for AA contrast compliance */
+    --background: 0 0% 100%;
+    --foreground: 210 19% 15%; /* Darker for better contrast */
+    
+    /* Primary Blues - Enhanced contrast */
+    --primary: 214 78% 55%; /* Slightly darker for AA compliance */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 214 78% 48%;
+    
+    /* Secondary Blues */
+    --secondary: 200 100% 70%; /* Adjusted for better contrast */
+    --secondary-foreground: 210 19% 15%;
+    
+    /* Dark Blue */
+    --dark-blue: 214 51% 20%; /* Darker for better contrast */
+    --dark-blue-foreground: 0 0% 100%;
+    
+    /* Background Colors */
+    --background-light: 210 17% 98%;
+    --background-blue: 208 53% 60%; /* Adjusted for contrast */
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 19% 15%; /* Improved contrast */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 19% 15%;
+
+    --muted: 210 17% 96%; /* Slightly darker for better contrast */
+    --muted-foreground: 214 10% 40%; /* Better contrast ratio */
+
+    --accent: 214 78% 55%; /* Adjusted for AA compliance */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 50%; /* Darker for better contrast */
+    --destructive-foreground: 0 0% 100%;
+    
+    --success: 140 55% 30%; /* Darker for better contrast */
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 38 100% 45%; /* Darker for better contrast */
+    --warning-foreground: 0 0% 100%;
+
+    --border: 214 17% 88%; /* Slightly darker for visibility */
+    --input: 214 17% 88%;
+    --ring: 214 78% 55%;
+    
+    /* Status Colors - Improved contrast */
+    --alert: 0 72% 50%;
+    --team: 214 78% 55%;
+    --admin: 270 45% 45%;
+    --project: 140 55% 30%;
+
+    --radius: 0.5rem;
+    
+    /* Focus outline for accessibility */
+    --focus-ring: 214 78% 55%;
+    --focus-ring-offset: 2px;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--background-blue)), hsl(var(--primary)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--dark-blue)), hsl(var(--primary)));
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-elegant: 0 10px 25px rgba(0, 0, 0, 0.15);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.2);
+    --shadow-focus: 0 0 0 2px hsl(var(--focus-ring));
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 210 19% 18%;
+    --sidebar-primary: 214 78% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 17% 98%;
+    --sidebar-accent-foreground: 210 19% 18%;
+    --sidebar-border: 214 17% 91%;
+    --sidebar-ring: 214 78% 59%;
+    
+    /* Animation */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 214 51% 24%;
+    --foreground: 0 0% 100%;
+
+    --card: 214 51% 24%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 214 51% 24%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 214 78% 59%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 214 51% 32%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 214 51% 32%;
+    --muted-foreground: 214 20% 70%;
+
+    --accent: 200 100% 73%;
+    --accent-foreground: 214 51% 24%;
+
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 51% 32%;
+    --input: 214 51% 32%;
+    --ring: 214 78% 59%;
+    
+    --sidebar-background: 214 51% 24%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 214 78% 59%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 51% 32%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 214 51% 32%;
+    --sidebar-ring: 214 78% 59%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+  }
+}
+
+/* Custom component variants */
+@layer components {
+  .btn-hero {
+    @apply bg-gradient-to-r from-dark-blue to-primary text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-elegant transition-all duration-300 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2;
+  }
+  
+  .gradient-bg {
+    background: var(--gradient-primary);
+  }
+  
+  .notification-unread {
+    @apply border-l-4 border-l-primary bg-primary/5;
+  }
+  
+  .notification-read {
+    @apply border-l-4 border-l-muted bg-background;
+  }
+
+  /* Focus styles for accessibility */
+  .focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2;
+  }
+
+  /* Skip link for screen readers */
+  .skip-link {
+    @apply absolute -top-10 left-6 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 focus:top-6 z-50;
+  }
+
+  /* High contrast focus indicators */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--focus-ring));
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .btn-hero {
+      @apply hover:translate-y-0;
+    }
+    
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
