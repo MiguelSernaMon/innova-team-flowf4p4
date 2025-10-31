@@ -8,8 +8,16 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Demo credentials
 export const DEMO_CREDENTIALS = {
-  email: "demo@example.com",
-  password: "demo1234",
+  admin: {
+    email: "admin@example.com",
+    password: "admin1234",
+    role: "admin"
+  },
+  user: {
+    email: "usuario@example.com",
+    password: "usuario1234",
+    role: "user"
+  }
 };
 
 // Types
@@ -37,17 +45,32 @@ export const authAPI = {
   async login(email: string, password: string) {
     await delay(1000); // Simulate network delay
     
-    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+    let userRole = null;
+    let userName = "";
+    
+    // Check admin credentials
+    if (email === DEMO_CREDENTIALS.admin.email && password === DEMO_CREDENTIALS.admin.password) {
+      userRole = DEMO_CREDENTIALS.admin.role;
+      userName = "Administrador";
+    }
+    // Check user credentials
+    else if (email === DEMO_CREDENTIALS.user.email && password === DEMO_CREDENTIALS.user.password) {
+      userRole = DEMO_CREDENTIALS.user.role;
+      userName = "Usuario Estándar";
+    }
+    
+    if (userRole) {
       const user = {
-        id: "1",
-        name: "Demo User",
+        id: userRole === "admin" ? "1" : "2",
+        name: userName,
         email: email,
-        role: "student",
+        role: userRole,
         avatar: "/api/avatar/1",
       };
       
-      // Store user in localStorage for demo
+      // Store user and role in localStorage for demo
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userRole", userRole);
       localStorage.setItem("token", "demo-token-123");
       
       return { success: true, user, token: "demo-token-123" };
@@ -59,6 +82,7 @@ export const authAPI = {
   async logout() {
     await delay(500);
     localStorage.removeItem("user");
+    localStorage.removeItem("userRole");
     localStorage.removeItem("token");
     return { success: true };
   },
@@ -206,6 +230,68 @@ export const teamsAPI = {
     await delay(800);
     // In a real app, this would add the user to the team
     return { success: true, message: "Te has unido al equipo exitosamente" };
+  },
+
+  async getTeamNotifications(teamId: string) {
+    await delay(800);
+    
+    const notifications = [
+      {
+        id: "1",
+        teamId,
+        title: "Nuevo miembro agregado",
+        description: "Juan Pérez ha sido agregado al equipo CodeFactory Sprint 1",
+        category: "[CodeFactory]",
+        categoryColor: "bg-team text-white",
+        createdAt: new Date(2025, 8, 17, 17, 35).toISOString(),
+        emailLink: "mailto:team@codefactory.com?subject=Nuevo%20Miembro",
+      },
+      {
+        id: "2",
+        teamId,
+        title: "Cambio de rol",
+        description: "María García ahora es Scrum Master del equipo",
+        category: "[Admin]",
+        categoryColor: "bg-admin text-white",
+        createdAt: new Date(2025, 8, 16, 14, 20).toISOString(),
+        emailLink: "mailto:team@codefactory.com?subject=Cambio%20Rol",
+      },
+    ];
+
+    return { success: true, notifications };
+  },
+
+  async getTeamMembers(teamId: string) {
+    await delay(800);
+    
+    const members = [
+      {
+        id: "1",
+        teamId,
+        name: "María García",
+        role: "Scrum Master",
+        roleColor: "bg-admin text-white",
+        email: "maria.garcia@example.com",
+      },
+      {
+        id: "2",
+        teamId,
+        name: "Juan Pérez",
+        role: "Frontend Developer",
+        roleColor: "bg-primary text-primary-foreground",
+        email: "juan.perez@example.com",
+      },
+      {
+        id: "3",
+        teamId,
+        name: "Ana López",
+        role: "Backend Developer",
+        roleColor: "bg-secondary text-secondary-foreground",
+        email: "ana.lopez@example.com",
+      },
+    ];
+
+    return { success: true, members };
   },
 };
 
