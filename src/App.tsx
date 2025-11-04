@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { isAuthenticated } from "@/hooks/use-auth";
 import LoginPageWrapper from "./pages/LoginPageWrapper";
 import DashboardPage from "./pages/DashboardPage";
 import TeamsPage from "./pages/TeamsPage";
@@ -15,26 +16,27 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
-// Auth check utility
-const isAuthenticated = () => {
-  const token = localStorage.getItem("token");
-  const user = localStorage.getItem("user");
-  return !!(token && user);
-};
-
-// Protected Route Component - now properly inside Router context
+// Protected Route Component - redirects to login if not authenticated
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  if (!isAuthenticated()) {
+  const authenticated = isAuthenticated();
+  
+  if (!authenticated) {
+    console.log('User not authenticated, redirecting to login');
     return <Navigate to="/" replace />;
   }
+  
   return <>{children}</>;
 };
 
-// Public Route Component - now properly inside Router context  
+// Public Route Component - redirects to dashboard if already authenticated
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  if (isAuthenticated()) {
+  const authenticated = isAuthenticated();
+  
+  if (authenticated) {
+    console.log('User already authenticated, redirecting to dashboard');
     return <Navigate to="/dashboard" replace />;
   }
+  
   return <>{children}</>;
 };
 

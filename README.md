@@ -1,5 +1,31 @@
 # Welcome to your Lovable project
 
+## 🔗 Backend Integration
+
+This project is integrated with a GraphQL backend API. See the complete integration guide:
+
+- 🚀 **[Quick Start Guide](./QUICK_START.md)** - Get started in 3 steps
+- 📖 **[Complete Integration Guide](./BACKEND_INTEGRATION.md)** - Full documentation
+- 💡 **[Usage Examples](./USAGE_EXAMPLES.md)** - Code examples
+- 📋 **[Integration Summary](./INTEGRATION_SUMMARY.md)** - What's implemented
+
+### Quick Setup
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start the app
+npm run dev
+
+# 3. Open browser console and run tests
+backendTests.runAll()
+```
+
+**Backend URL:** `http://localhost:8080/api/v1/graphql`
+
+---
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/da1e61f4-3179-43c7-95dd-e4294a9bf4f0
@@ -59,6 +85,8 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- **Apollo Client** - GraphQL client
+- **GraphQL** - API queries and mutations
 
 ## How can I deploy this project?
 

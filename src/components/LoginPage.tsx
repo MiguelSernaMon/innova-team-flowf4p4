@@ -63,7 +63,11 @@ export default function LoginPage() {
           description: "Has iniciado sesión exitosamente",
           variant: "default",
         });
-        navigate("/dashboard");
+        
+        // Small delay to show the toast, then redirect
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true });
+        }, 100);
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Error al iniciar sesión";
@@ -73,7 +77,7 @@ export default function LoginPage() {
       setStatusMessage(`Error: ${errorMessage}`);
       toast({
         title: "Error",
-        description: "Credenciales inválidas. Intenta con demo@example.com / demo1234",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -137,6 +141,16 @@ export default function LoginPage() {
                   <h1 className="text-xl font-semibold mb-6 text-center">
                     Iniciar Sesión
                   </h1>
+
+                  {/* Demo Credentials Helper */}
+                  <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm">
+                    <p className="font-semibold mb-1">Credenciales de prueba:</p>
+                    <div className="space-y-1 text-xs">
+                      <p><strong>Estudiante:</strong> estudiante@udea.edu.co / password123</p>
+                      <p><strong>Profesor:</strong> profesor@udea.edu.co / password123</p>
+                      <p><strong>Admin:</strong> admin@udea.edu.co / admin123</p>
+                    </div>
+                  </div>
 
                   {errors.general && (
                     <div 
