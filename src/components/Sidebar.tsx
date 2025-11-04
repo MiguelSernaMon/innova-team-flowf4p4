@@ -12,7 +12,8 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  Wifi
 } from "lucide-react";
 
 interface SidebarProps {
@@ -54,6 +55,12 @@ export default function Sidebar({ isMobileOpen, onMobileToggle }: SidebarProps) 
       name: "Estadísticas",
       href: "/stats",
       icon: BarChart3,
+      current: false,
+    },
+    {
+      name: "WebSocket Demo",
+      href: "/websocket-demo",
+      icon: Wifi,
       current: false,
     },
     {

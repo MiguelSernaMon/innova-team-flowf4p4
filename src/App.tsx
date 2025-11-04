@@ -13,6 +13,7 @@ import StatsPage from "./pages/StatsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import WebSocketActionsPanel from "./components/examples/WebSocketActionsPanel";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +102,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <SettingsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/websocket-demo" 
+              element={
+                <ProtectedRoute>
+                  <WebSocketActionsPanel />
                 </ProtectedRoute>
               } 
             />

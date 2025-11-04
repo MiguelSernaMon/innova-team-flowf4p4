@@ -92,6 +92,51 @@ export interface NotificationStats {
   read: number;
 }
 
+// ==================== WEBSOCKET TYPES ====================
+
+export interface WebSocketMessage<T = any> {
+  type: string;
+  payload: T;
+  timestamp: string;
+}
+
+export interface WSNotificationMessage {
+  id: string;
+  title: string;
+  message: string;
+  type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR' | 'TEAM_UPDATE' | 'ADMIN';
+  userId?: string;
+  teamId?: string;
+  timestamp: string;
+}
+
+export interface TeamUpdateMessage {
+  teamId: string;
+  action: 'MEMBER_ADDED' | 'MEMBER_REMOVED' | 'TEAM_UPDATED' | 'TEAM_DELETED';
+  memberId?: string;
+  memberName?: string;
+  updatedBy: string;
+  timestamp: string;
+  details?: string;
+}
+
+export interface AdminNotificationMessage {
+  id: string;
+  title: string;
+  message: string;
+  action: 'USER_REGISTERED' | 'TEAM_CREATED' | 'SYSTEM_ALERT';
+  userId?: string;
+  teamId?: string;
+  timestamp: string;
+}
+
+export type WebSocketConnectionState = 
+  | 'NOT_INITIALIZED' 
+  | 'CONNECTING' 
+  | 'CONNECTED' 
+  | 'DISCONNECTED' 
+  | 'ERROR';
+
 // ==================== API RESPONSE TYPES ====================
 
 export interface ApiError {

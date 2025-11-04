@@ -25,6 +25,10 @@
 
   <body>
     <div id="root"></div>
+    <!-- Fix for sockjs-client in Vite -->
+    <script>
+      window.global = window;
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
