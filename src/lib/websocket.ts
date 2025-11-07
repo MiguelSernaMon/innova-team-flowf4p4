@@ -3,11 +3,11 @@
  * Maneja conexiones STOMP sobre WebSocket para notificaciones en tiempo real
  * 
  * Endpoints del Backend:
- * - WS Endpoint: ws://localhost:8080/api/v1/ws
+ * - WS Endpoint: ws://localhost:8080/graphql-ws
  * - Topics:
- *   - /topic/notifications - Notificaciones globales
- *   - /topic/teams/{teamId} - Notificaciones de equipo específico
- *   - /user/queue/notifications - Notificaciones privadas del usuario
+ *   - /topic/notificaciones - Notificaciones globales
+ *   - /user/queue/mensajes - Mensajes privados del usuario
+ *   - /topic/proyecto/{id} - Actualizaciones de proyecto específico
  */
 
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
@@ -57,6 +57,13 @@ class WebSocketService {
    */
   connect(token: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      // 🎬 Modo Demo: No conectar si es token fake
+      if (token.startsWith('fake-token-')) {
+        console.log('🎬 Modo Demo - WebSocket no disponible (sin backend)');
+        reject(new Error('Demo mode - WebSocket disabled'));
+        return;
+      }
+
       if (this.client?.connected) {
         console.log('WebSocket ya está conectado');
         resolve();
@@ -65,12 +72,13 @@ class WebSocketService {
 
       if (this.isConnecting) {
         console.log('WebSocket ya está intentando conectar');
+        reject(new Error('Connection already in progress'));
         return;
       }
 
       this.isConnecting = true;
 
-      const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:8080/api/v1/ws';
+      const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:8080/graphql-ws';
 
       // Crear cliente STOMP
       this.client = new Client({

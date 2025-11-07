@@ -26,13 +26,24 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   // Conectar al WebSocket
   const connect = useCallback(async () => {
-    if (connectAttempted.current) return;
+    if (connectAttempted.current) {
+      console.log('⏭️ Ya se intentó conectar, saltando...');
+      return;
+    }
     connectAttempted.current = true;
 
     const token = localStorage.getItem('authToken') || localStorage.getItem('token');
     if (!token) {
       console.warn('No hay token disponible para WebSocket');
-      setConnectionState('ERROR');
+      setConnectionState('DISCONNECTED');
+      return;
+    }
+
+    // 🎬 Modo Demo: No conectar WebSocket si es token fake
+    if (token.startsWith('fake-token-')) {
+      console.log('🎬 Modo Demo - WebSocket deshabilitado (no hay backend)');
+      setConnectionState('DISCONNECTED');
+      setIsConnected(false);
       return;
     }
 
@@ -43,11 +54,21 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       setIsConnected(true);
       onConnect?.();
     } catch (error) {
+      const errorMessage = (error as Error).message;
+      
+      // No mostrar error ni reintentar en modo demo
+      if (errorMessage.includes('Demo mode')) {
+        console.log('🎬 Modo Demo detectado - WebSocket deshabilitado');
+        setConnectionState('DISCONNECTED');
+        setIsConnected(false);
+        return;
+      }
+
       console.error('Error conectando WebSocket:', error);
-      setConnectionState('ERROR');
+      setConnectionState('DISCONNECTED');
       setIsConnected(false);
       onError?.(error as Error);
-      connectAttempted.current = false; // Permitir reintentos
+      // NO resetear connectAttempted para evitar loops infinitos
     }
   }, [onConnect, onError]);
 
