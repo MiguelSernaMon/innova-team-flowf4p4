@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 
 // GraphQL endpoint - change to your backend URL
-const GRAPHQL_URI = import.meta.env.VITE_GRAPHQL_URI || 'http://localhost:8080/api/v1/graphql';
+const GRAPHQL_URI = 'http://localhost:8081/api/v1/graphql';
 
 const httpLink = createHttpLink({
   uri: GRAPHQL_URI,

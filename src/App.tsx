@@ -6,14 +6,16 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { isAuthenticated } from "@/hooks/use-auth";
 import LoginPageWrapper from "./pages/LoginPageWrapper";
 import DashboardPage from "./pages/DashboardPage";
+import NotificationsPage from "./pages/NotificationsPage";
+import NotificationSettingsPage from "./pages/NotificationSettingsPage";
 import TeamsPage from "./pages/TeamsPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProfilePage from "./pages/ProfilePage";
 import StatsPage from "./pages/StatsPage";
 import SettingsPage from "./pages/SettingsPage";
+import PermissionsPage from "./pages/PermissionsPage";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
-import WebSocketActionsPanel from "./components/examples/WebSocketActionsPanel";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +68,22 @@ const App = () => (
               } 
             />
             <Route 
+              path="/notifications" 
+              element={
+                <ProtectedRoute>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/notifications/settings" 
+              element={
+                <ProtectedRoute>
+                  <NotificationSettingsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/profile" 
               element={
                 <ProtectedRoute>
@@ -106,10 +124,10 @@ const App = () => (
               } 
             />
             <Route 
-              path="/websocket-demo" 
+              path="/permissions" 
               element={
                 <ProtectedRoute>
-                  <WebSocketActionsPanel />
+                  <PermissionsPage />
                 </ProtectedRoute>
               } 
             />

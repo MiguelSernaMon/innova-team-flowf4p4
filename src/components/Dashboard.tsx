@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -10,20 +10,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { notificationsAPI, type Notification, type NotificationStats } from "@/lib/api";
+import { mockNotificationsAPI, getNotificationCategory, mockPermissionsAPI } from "@/lib/mock-api";
+import type { Notification, NotificationStats } from "@/lib/types";
 import NotificationCard from "./NotificationCard";
 import LoadingSpinner from "./LoadingSpinner";
 import StatusAnnouncer from "./StatusAnnouncer";
-import { useWebSocket } from "@/hooks/use-websocket";
-import { websocketService } from "@/lib/websocket";
 import { 
   Bell, 
   Search, 
   Filter, 
   Eye,
-  Loader2,
-  Wifi,
-  WifiOff
+  Loader2
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -34,9 +31,17 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState<any>(null);
   
   const { toast } = useToast();
-  const { isConnected } = useWebSocket();
+
+  // Load current user from localStorage
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setCurrentUser(JSON.parse(userStr));
+    }
+  }, []);
 
   const filterOptions = [
     { value: "all", label: "Todas" },
@@ -46,68 +51,19 @@ export default function Dashboard() {
     { value: "project", label: "Proyectos" },
   ];
 
-  // Callback para agregar notificaciones en tiempo real
-  const handleRealtimeNotification = useCallback((notification: any) => {
-    console.log('📬 Nueva notificación en tiempo real:', notification);
-    
-    // Convertir notificación WebSocket a formato del Dashboard
-    const newNotification: Notification = {
-      id: notification.id || `ws-${Date.now()}`,
-      title: notification.title,
-      description: notification.message || notification.description,
-      type: (notification.type?.toLowerCase() || 'alert') as any,
-      status: 'unread',
-      createdAt: notification.timestamp || new Date().toISOString(),
-      link: notification.link,
-    };
-
-    // Agregar a la lista (evitar duplicados)
-    setNotifications(prev => {
-      const exists = prev.some(n => n.id === newNotification.id);
-      if (exists) return prev;
-      return [newNotification, ...prev];
-    });
-
-    // Actualizar stats
-    setStats(prev => ({
-      total: prev.total + 1,
-      unread: prev.unread + 1,
-      read: prev.read,
-    }));
-
-    // Anunciar nueva notificación
-    setStatusMessage(`Nueva notificación: ${newNotification.title}`);
-  }, []);
-
-  // Suscribirse a notificaciones WebSocket
-  useEffect(() => {
-    if (!isConnected) return;
-
-    console.log('📡 Dashboard: Suscribiéndose a notificaciones en tiempo real...');
-
-    // Suscripción a notificaciones personales
-    const unsubscribeUser = websocketService.subscribeToUserNotifications(
-      handleRealtimeNotification
-    );
-
-    // Suscripción a notificaciones globales
-    const unsubscribeGlobal = websocketService.subscribeToNotifications(
-      handleRealtimeNotification
-    );
-
-    return () => {
-      console.log('📡 Dashboard: Desuscribiéndose de notificaciones');
-      unsubscribeUser();
-      unsubscribeGlobal();
-    };
-  }, [isConnected, handleRealtimeNotification]);
-
-  // Load notifications
+  // Load notifications usando mock API con filtrado por rol
   const loadNotifications = async () => {
     try {
       setIsLoading(true);
       setStatusMessage("Cargando notificaciones...");
-      const response = await notificationsAPI.getNotifications({
+      
+      // Obtener el usuario actual del localStorage
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userRole = user?.role || 'STUDENT';
+      
+      // Usar la API de permisos para obtener notificaciones filtradas por rol
+      const response = await mockPermissionsAPI.getNotificationsForRole(userRole, {
         type: typeFilter,
         search: searchQuery,
       });
@@ -115,7 +71,7 @@ export default function Dashboard() {
       if (response.success) {
         setNotifications(response.notifications);
         setStats(response.stats);
-        setStatusMessage(`${response.notifications.length} notificaciones cargadas`);
+        setStatusMessage(`${response.notifications.length} notificaciones cargadas para ${userRole}`);
       }
     } catch (error) {
       const errorMessage = "Error al cargar las notificaciones";
@@ -146,7 +102,7 @@ export default function Dashboard() {
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await notificationsAPI.markAsRead(notificationId);
+      await mockNotificationsAPI.markAsRead(notificationId);
       
       // Update local state
       setNotifications(prev => 
@@ -175,7 +131,7 @@ export default function Dashboard() {
   const handleMarkAllAsRead = async () => {
     try {
       setIsMarkingAllRead(true);
-      await notificationsAPI.markAllAsRead();
+      await mockNotificationsAPI.markAllAsRead();
       
       // Update local state
       setNotifications(prev => 
@@ -218,56 +174,53 @@ export default function Dashboard() {
       <StatusAnnouncer message={statusMessage} />
       
       <div className="flex-1 p-6 bg-background-light min-h-screen">
+        {/* User Info Header */}
+        {currentUser && currentUser.name && (
+          <div className="bg-background rounded-lg shadow-soft p-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-lg font-bold text-primary">
+                  {currentUser.name.charAt(0)}
+                </span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-foreground" data-testid="user-name">
+                  {currentUser.name}
+                </h2>
+                <p className="text-sm text-gray-500" data-testid="user-role">
+                  {currentUser.role || 'Usuario'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Header */}
-        <header className="bg-background rounded-lg shadow-soft p-6 mb-6">
+        <header className="bg-background rounded-lg shadow-soft p-6 mb-6"  data-testid="dashboard-header">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             {/* Left side - Title and bell */}
             <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-bold text-foreground">Notificaciones</h1>
+              <h1 className="text-3xl font-bold text-foreground" data-testid="dashboard-title">Notificaciones</h1>
               
-              {/* WebSocket Status Indicator */}
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="relative"
-                    aria-label={`Notificaciones. ${stats.unread} sin leer de ${stats.total} total`}
-                  >
-                    <Bell className="h-6 w-6" />
-                    {stats.unread > 0 && (
-                      <Badge 
-                        variant="destructive" 
-                        className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                        aria-label={`${stats.unread} notificaciones sin leer`}
-                      >
-                        {stats.unread}
-                      </Badge>
-                    )}
-                  </Button>
-                </div>
-                
-                {/* Connection Status */}
-                <div 
-                  className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-                    isConnected 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                  }`}
-                  title={isConnected ? 'WebSocket conectado - Notificaciones en tiempo real activas' : 'WebSocket desconectado'}
+              {/* Notification Bell */}
+              <div className="relative">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="relative"
+                  aria-label={`Notificaciones. ${stats.unread} sin leer de ${stats.total} total`}
                 >
-                  {isConnected ? (
-                    <>
-                      <Wifi className="h-3 w-3" />
-                      <span className="hidden sm:inline">En vivo</span>
-                    </>
-                  ) : (
-                    <>
-                      <WifiOff className="h-3 w-3" />
-                      <span className="hidden sm:inline">Desconectado</span>
-                    </>
+                  <Bell className="h-6 w-6" />
+                  {stats.unread > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                      aria-label={`${stats.unread} notificaciones sin leer`}
+                    >
+                      {stats.unread}
+                    </Badge>
                   )}
-                </div>
+                </Button>
               </div>
             </div>
 

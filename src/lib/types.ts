@@ -4,7 +4,11 @@ export enum UserRole {
   STUDENT = 'STUDENT',
   PROFESSOR = 'PROFESSOR',
   TA = 'TA',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
+  PRODUCT_OWNER = 'PRODUCT_OWNER',
+  SCRUM_MASTER = 'SCRUM_MASTER',
+  TESTER = 'TESTER',
+  DEVELOPER = 'DEVELOPER'
 }
 
 export interface User {
@@ -90,6 +94,27 @@ export interface NotificationStats {
   total: number;
   unread: number;
   read: number;
+}
+
+// ==================== NOTIFICATION PERMISSIONS TYPES ====================
+
+export interface NotificationPermission {
+  roleId: string;
+  roleName: string;
+  canReceive: NotificationType[];
+  canSend: NotificationType[];
+}
+
+export interface NotificationPermissionConfig {
+  permissions: NotificationPermission[];
+  lastUpdated: string;
+  updatedBy: string;
+}
+
+export interface UpdatePermissionRequest {
+  roleId: string;
+  canReceive?: NotificationType[];
+  canSend?: NotificationType[];
 }
 
 // ==================== WEBSOCKET TYPES ====================

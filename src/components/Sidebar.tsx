@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { authAPI } from "@/lib/api";
+import { mockAuthAPI } from "@/lib/mock-api";
 import { 
   User, 
   Bell, 
@@ -13,7 +13,7 @@ import {
   LogOut,
   Menu,
   X,
-  Wifi
+  Shield
 } from "lucide-react";
 
 interface SidebarProps {
@@ -23,8 +23,16 @@ interface SidebarProps {
 
 export default function Sidebar({ isMobileOpen, onMobileToggle }: SidebarProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Get current user role on mount
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    setCurrentUserRole(user?.role || '');
+  }, []);
 
   const navigationItems = [
     {
@@ -34,10 +42,16 @@ export default function Sidebar({ isMobileOpen, onMobileToggle }: SidebarProps) 
       current: false,
     },
     {
-      name: "Notificaciones", 
+      name: "Dashboard", 
       href: "/dashboard",
       icon: Bell,
       current: true,
+    },
+    {
+      name: "Notificaciones", 
+      href: "/notifications",
+      icon: Bell,
+      current: false,
     },
     {
       name: "Equipos",
@@ -58,10 +72,11 @@ export default function Sidebar({ isMobileOpen, onMobileToggle }: SidebarProps) 
       current: false,
     },
     {
-      name: "WebSocket Demo",
-      href: "/websocket-demo",
-      icon: Wifi,
+      name: "Permisos",
+      href: "/permissions",
+      icon: Shield,
       current: false,
+      adminOnly: true, // Solo visible para admins
     },
     {
       name: "Configuración",
@@ -74,7 +89,7 @@ export default function Sidebar({ isMobileOpen, onMobileToggle }: SidebarProps) 
   const handleLogout = async () => {
     setIsLoading(true);
     try {
-      await authAPI.logout();
+      await mockAuthAPI.logout();
       toast({
         title: "Sesión cerrada",
         description: "Has cerrado sesión exitosamente",
@@ -117,7 +132,15 @@ export default function Sidebar({ isMobileOpen, onMobileToggle }: SidebarProps) 
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6" aria-label="Navegación principal">
         <ul className="space-y-2" role="list">
-          {navigationItems.map((item) => {
+          {navigationItems
+            .filter((item) => {
+              // Filter out admin-only items if user is not admin
+              if (item.adminOnly) {
+                return currentUserRole === 'ADMIN';
+              }
+              return true;
+            })
+            .map((item) => {
             const Icon = item.icon;
             return (
               <li key={item.name}>

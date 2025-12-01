@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { authAPI } from "@/lib/api";
+import { mockAuthAPI } from "@/lib/mock-api";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import teamIllustration from "@/assets/team-illustration.png";
 import SkipLink from "./SkipLink";
@@ -22,41 +22,23 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const validateForm = () => {
-    const newErrors: typeof errors = {};
-    
-    if (!email) {
-      newErrors.email = "El email es requerido";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "El email no es válido";
-    }
-    
-    if (!password) {
-      newErrors.password = "La contraseña es requerida";
-    } else if (password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
+  // NO validar el formulario en el frontend para permitir que el mock API
+  // maneje todos los casos de error según los escenarios E2E
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      setStatusMessage("Por favor, corrige los errores en el formulario");
-      return;
-    }
     
     setIsLoading(true);
     setErrors({});
     setStatusMessage("Iniciando sesión...");
     
     try {
-      const response = await authAPI.login(email, password);
+      const response = await mockAuthAPI.login(email, password);
       
       if (response.success) {
+        // Guardar información de usuario en localStorage
+        localStorage.setItem('authToken', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        
         setStatusMessage("¡Sesión iniciada exitosamente! Redirigiendo...");
         toast({
           title: "¡Bienvenido!",
@@ -144,11 +126,10 @@ export default function LoginPage() {
 
                   {/* Demo Credentials Helper */}
                   <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm">
-                    <p className="font-semibold mb-1">Credenciales de prueba:</p>
+                    <p className="font-semibold mb-1">Credenciales válidas para E2E:</p>
                     <div className="space-y-1 text-xs">
-                      <p><strong>Estudiante:</strong> estudiante@udea.edu.co / password123</p>
-                      <p><strong>Profesor:</strong> profesor@udea.edu.co / password123</p>
-                      <p><strong>Admin:</strong> admin@udea.edu.co / admin123</p>
+                      <p><strong>Usuario:</strong> usuario@udea.edu.co</p>
+                      <p><strong>Contraseña:</strong> clave123</p>
                     </div>
                   </div>
 
@@ -173,7 +154,6 @@ export default function LoginPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         className={errors.email ? "border-destructive focus:ring-destructive" : ""}
                         disabled={isLoading}
-                        required
                         aria-invalid={!!errors.email}
                         aria-describedby={errors.email ? "email-error" : undefined}
                         autoComplete="email"
@@ -200,9 +180,8 @@ export default function LoginPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           className={errors.password ? "border-destructive focus:ring-destructive pr-10" : "pr-10"}
                           disabled={isLoading}
-                          required
                           aria-invalid={!!errors.password}
-                          aria-describedby={errors.password ? "password-error" : "password-help"}
+                          aria-describedby={errors.password ? "password-error" : undefined}
                           autoComplete="current-password"
                         />
                         <button
@@ -219,9 +198,6 @@ export default function LoginPage() {
                           )}
                         </button>
                       </div>
-                      <p id="password-help" className="text-xs text-muted-foreground">
-                        La contraseña debe tener al menos 6 caracteres
-                      </p>
                       {errors.password && (
                         <p 
                           id="password-error" 
