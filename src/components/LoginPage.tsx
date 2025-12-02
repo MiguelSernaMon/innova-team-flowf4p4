@@ -148,6 +148,7 @@ export default function LoginPage() {
                       <Label htmlFor="email">Email *</Label>
                       <Input
                         id="email"
+                        data-testid="email-input"
                         type="email"
                         placeholder="Ingresa tu email"
                         value={email}
