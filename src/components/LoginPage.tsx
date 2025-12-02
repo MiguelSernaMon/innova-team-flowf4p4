@@ -214,6 +214,7 @@ export default function LoginPage() {
                       className="w-full btn-hero"
                       disabled={isLoading}
                       aria-describedby="login-status"
+                      data-testid="login-button"
                     >
                       {isLoading ? (
                         <>

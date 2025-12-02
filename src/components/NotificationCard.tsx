@@ -81,6 +81,7 @@ export default function NotificationCard({
             <Badge 
               variant="secondary" 
               className={`${config.color} text-xs font-medium`}
+              data-testid="notification-category"
             >
               {config.label}
             </Badge>
@@ -92,7 +93,9 @@ export default function NotificationCard({
           {/* Title */}
           <h4 className={`font-semibold text-sm ${
             notification.status === "unread" ? "text-foreground" : "text-muted-foreground"
-          }`}>
+          }`}
+          data-testid="notification-title"
+          >
             {notification.title}
           </h4>
 
