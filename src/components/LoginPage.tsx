@@ -175,6 +175,7 @@ export default function LoginPage() {
                       <div className="relative">
                         <Input
                           id="password"
+                          data-testid="password-input"
                           type={showPassword ? "text" : "password"}
                           placeholder="Ingresa tu contraseña"
                           value={password}
